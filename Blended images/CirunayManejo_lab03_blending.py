@@ -59,11 +59,11 @@ def blend_images(img1, img2, mask, levels, sigma):
 
 # Function to display the Gaussian stack
 def display_gaussian_stack(img, levels, sigma):
-    # Apply Gaussian blur and get the Gaussian stack
     gaussian_stack = apply_gaussian(img, levels, sigma)
 
     # Display the Gaussian stack
     plt.figure(figsize=(12, 6))
+    plt.title("Gaussian Stack")
     for i in range(levels):
         plt.subplot(1, levels, i + 1)
         plt.imshow(gaussian_stack[i], cmap='gray')
@@ -75,11 +75,12 @@ def display_gaussian_stack(img, levels, sigma):
 
 # Function to display the Laplacian stack
 def display_laplacian_stack(img, levels, sigma):
-    # Get the Laplacian stack
+
     laplacian_stack = laplacian_effect(img, levels, sigma)
 
     # Display the Laplacian stack
     plt.figure(figsize=(12, 6))
+    plt.title("Laplacian Stack")
     for i in range(levels):
         plt.subplot(1, levels, i + 1)
         plt.imshow(laplacian_stack[i], cmap='gray', clim=(0, 0.1))
@@ -90,13 +91,13 @@ def display_laplacian_stack(img, levels, sigma):
     plt.show()
 
 # Load the images
-img1 = cv2.imread('images/4.jpg', cv2.IMREAD_GRAYSCALE)
-img2 = cv2.imread('images/3.jpg', cv2.IMREAD_GRAYSCALE)
-mask = cv2.imread('images/mask2.jpg', cv2.IMREAD_GRAYSCALE)
+imgA = cv2.imread('images/CirunayManejo_lab03_a.png', cv2.IMREAD_GRAYSCALE)
+imgB = cv2.imread('images/CirunayManejo_lab03_b.png', cv2.IMREAD_GRAYSCALE)
+mask = cv2.imread('images/CirunayManejo_lab03_mask.png', cv2.IMREAD_GRAYSCALE)
 
 # normalize images
-img1 = img1 / 255.0
-img2 = img2 / 255.0
+imgA = imgA / 255.0
+imgB = imgB / 255.0
 mask = mask / 255.0
 
 # Parameters for the stack
@@ -104,13 +105,13 @@ levels = 5
 sigma = 1
 
 # Display Gaussian stack for img2
-display_gaussian_stack(img2, levels, sigma)
+display_gaussian_stack(imgB, levels, sigma)
 
 # Display Laplacian stack for img2
-display_laplacian_stack(img2, levels, sigma)
+display_laplacian_stack(imgB, levels, sigma)
 
 # Blend the images
-blended_image = blend_images(img1, img2, mask, levels, sigma)
+blended_image = blend_images(imgA, imgB, mask, levels, sigma)
 blended_image = np.clip(blended_image, 0, 1) 
 blended_image = (blended_image * 255).astype(np.uint8)  
 
@@ -119,14 +120,14 @@ plt.title("Blended Image")
 plt.axis("off")
 plt.show()
 
-cv2.imwrite('CirunayManejo_Lab03_3.png', blended_image)
+cv2.imwrite('output/CirunayManejo_Lab03.png', blended_image)
 
 # WITH DIFFERENT PARAMETERS
 levels = 12
 sigma = 1
 
 # Blend the images
-blended_image = blend_images(img1, img2, mask, levels, sigma)
+blended_image = blend_images(imgA, imgB, mask, levels, sigma)
 blended_image = np.clip(blended_image, 0, 1) 
 blended_image = (blended_image * 255).astype(np.uint8)  
 
@@ -135,7 +136,7 @@ plt.title("Blended Image")
 plt.axis("off")
 plt.show()
 
-cv2.imwrite('Improved_2.png', blended_image)
+cv2.imwrite('output/CirunayManejo_Lab03_enhanced.png', blended_image)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
