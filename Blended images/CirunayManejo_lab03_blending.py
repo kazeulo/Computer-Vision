@@ -90,10 +90,11 @@ def display_laplacian_stack(img, levels, sigma):
     plt.show()
 
 # Load the images
-img1 = cv2.imread('images/1.jpg', cv2.IMREAD_GRAYSCALE)
-img2 = cv2.imread('images/2.jpg', cv2.IMREAD_GRAYSCALE)
-mask = cv2.imread('images/mask.jpg', cv2.IMREAD_GRAYSCALE)
+img1 = cv2.imread('images/4.jpg', cv2.IMREAD_GRAYSCALE)
+img2 = cv2.imread('images/3.jpg', cv2.IMREAD_GRAYSCALE)
+mask = cv2.imread('images/mask2.jpg', cv2.IMREAD_GRAYSCALE)
 
+# normalize images
 img1 = img1 / 255.0
 img2 = img2 / 255.0
 mask = mask / 255.0
@@ -102,10 +103,10 @@ mask = mask / 255.0
 levels = 5
 sigma = 1
 
-# Display Gaussian stack for img1
+# Display Gaussian stack for img2
 display_gaussian_stack(img2, levels, sigma)
 
-# Display Laplacian stack for img1
+# Display Laplacian stack for img2
 display_laplacian_stack(img2, levels, sigma)
 
 # Blend the images
@@ -118,7 +119,23 @@ plt.title("Blended Image")
 plt.axis("off")
 plt.show()
 
-cv2.imwrite('CirunayManejo_Lab03.png', blended_image)
+cv2.imwrite('CirunayManejo_Lab03_3.png', blended_image)
+
+# WITH DIFFERENT PARAMETERS
+levels = 12
+sigma = 1
+
+# Blend the images
+blended_image = blend_images(img1, img2, mask, levels, sigma)
+blended_image = np.clip(blended_image, 0, 1) 
+blended_image = (blended_image * 255).astype(np.uint8)  
+
+plt.imshow(blended_image, cmap='gray')
+plt.title("Blended Image")
+plt.axis("off")
+plt.show()
+
+cv2.imwrite('Improved_2.png', blended_image)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
