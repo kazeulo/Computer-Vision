@@ -93,9 +93,9 @@ def display_laplacian_stack(img, levels, sigma):
     plt.show()
 
 # Load the images as grayscale
-imgA = cv2.imread('images/1.png', cv2.IMREAD_GRAYSCALE)
-imgB = cv2.imread('images/2.png', cv2.IMREAD_GRAYSCALE)
-mask = cv2.imread('images/CirunayManejo_lab03_mask.png', cv2.IMREAD_GRAYSCALE)
+imgA = cv2.imread('CirunayManejo_lab03_a.png', cv2.IMREAD_GRAYSCALE)
+imgB = cv2.imread('CirunayManejo_lab03_b.png', cv2.IMREAD_GRAYSCALE)
+mask = cv2.imread('CirunayManejo_lab03_mask.png', cv2.IMREAD_GRAYSCALE)
 
 # normalize images
 imgA = imgA / 255.0

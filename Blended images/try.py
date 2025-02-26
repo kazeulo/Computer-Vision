@@ -130,28 +130,38 @@ imgA = cv2.imread('images/CirunayManejo_lab03_a.png', cv2.IMREAD_COLOR)
 imgB = cv2.imread('images/CirunayManejo_lab03_b.png', cv2.IMREAD_COLOR)
 mask = cv2.imread('images/CirunayManejo_lab03_mask.png', cv2.IMREAD_GRAYSCALE)
 
-# # Normalize images
-# imgA = imgA / 255.0
-# imgB = imgB / 255.0
-# mask = mask / 255.0
+# Convert imgA and imgB to uint8 before using cvtColor
+imgA_uint8 = (imgA * 255).astype(np.uint8)
+imgB_uint8 = (imgB * 255).astype(np.uint8)
 
-# Parameters for the stack
-levels = 12
+# Convert the images from BGR to RGB for proper display with matplotlib
+imgA_rgb = cv2.cvtColor(imgA_uint8, cv2.COLOR_BGR2RGB)
+imgB_rgb = cv2.cvtColor(imgB_uint8, cv2.COLOR_BGR2RGB)
+
+# Initialize parameters
+levels = 6
 sigma = 1
 
+# Normalize images
+imgA_rgb = imgA / 255.0
+imgB_rgb = imgB / 255.0
+mask = mask / 255.0
+
 # Blend the color images
-blended_image = blend_images_color(imgA, imgB, mask, levels, sigma)
+blended_image = blend_images_color(imgA_rgb, imgB_rgb, mask, levels, sigma)
 blended_image = np.clip(blended_image, 0, 1) 
 blended_image = (blended_image * 255).astype(np.uint8)
 
+blended_rgb = cv2.cvtColor(blended_image, cv2.COLOR_BGR2RGB)
+
 # Display the blended image
-plt.imshow(blended_image)
+plt.imshow(blended_rgb)
 plt.title("Blended Image")
 plt.axis("off")
 plt.show()
 
-# Save the output
-cv2.imwrite('output/CirunayManejo_Lab03_enhanced.png', blended_image)
+# Save the output as 
+cv2.imwrite('CirunayManejo_Lab03_colored.png', blended_image)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
