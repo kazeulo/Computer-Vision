@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Conversion function from mm² to inch²
 def mm_to_inches(area_mm2):
@@ -20,7 +21,26 @@ def is_circular(contour):
     # If the circularity is close to 1, it is roughly a circle
     return circularity > 0.7 
 
+# function for showing the detected edges in the image
+def show_images(images, titles):
+    # Create subplots for displaying all images at once
+    n = len(images)
+    fig, axes = plt.subplots(1, n, figsize=(15, 5))
+    
+    # Loop through the images and titles to display them
+    for i in range(n):
+        axes[i].imshow(images[i], cmap='gray')
+        axes[i].set_title(titles[i])
+        axes[i].axis('off') 
+    
+    # Show the plot
+    plt.tight_layout()
+    plt.show()
+
 def compute_area(images, coin_diameter):
+
+    processed_images = []
+    titles = []
 
     # iterate through the shells
     for idx, shell_img in enumerate(images):
@@ -54,7 +74,9 @@ def compute_area(images, coin_diameter):
         print(f"\nShell {idx + 1}")
         print("Number of Contours found = " + str(len(contours_list)))
 
-        # Draw contours on the edged image
+        # Keep a copy of the edged image for visualization
+        detected_edges = edged.copy()
+        # Draw contours on the edged image  
         cv2.drawContours(edged, contours_list, -1, (0, 255, 0), 3)
 
         # Try to find the coin contour
@@ -93,6 +115,13 @@ def compute_area(images, coin_diameter):
 
         else:
             print("No circular contour found for the coin/no coin detected.")
+
+        # Add the image and its title to the lists
+        processed_images.append(detected_edges)
+        titles.append(f"Shell {idx + 1}")
+
+    # Show all images of the detected edges
+    show_images(processed_images, titles)
 
 # read shell images
 shell1 = cv2.imread('images/Shell001.png')
