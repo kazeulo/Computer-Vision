@@ -41,9 +41,13 @@ def feather_blend(img1, img2):
     mask1 = (np.sum(img1, axis=2) > 0).astype(np.uint8) * 255
     mask2 = (np.sum(img2, axis=2) > 0).astype(np.uint8) * 255
 
-    # Perform distance transform
+    # Perform distance perform
     dist_transform1 = cv2.distanceTransform(255 - mask1, cv2.DIST_L2, 5)
     dist_transform2 = cv2.distanceTransform(255 - mask2, cv2.DIST_L2, 5)
+
+    # Apply Gaussian blur to smooth the alpha blending
+    dist_transform1 = cv2.GaussianBlur(dist_transform1, (5, 5), 5)
+    dist_transform2 = cv2.GaussianBlur(dist_transform2, (5, 5), 5)
 
     # Calculate the blending mask
     total_dist = dist_transform1 + dist_transform2 + 1e-6
@@ -72,6 +76,20 @@ def warp_and_blend(base_img, new_img, H):
 
     return feather_blend(base_warped, new_warped)
 
+def final_crop(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    non_zero_coords = cv2.findNonZero(gray)
+    
+    # Get the bounding box of the non-zero area
+    x, y, w, h = cv2.boundingRect(non_zero_coords)
+        
+    # Remove black spaces and crop
+    cropped_image = image[y:y+h, x:x+w]
+    cropped_image = cropped_image[20:-20, 15:-15]
+
+    return cropped_image
+
 def stitch_images(images):
     primary_img = images[0]
 
@@ -83,7 +101,10 @@ def stitch_images(images):
 
         primary_img = warp_and_blend(primary_img, images[i], H)
 
-    return primary_img
+        final_image = final_crop(primary_img)
+    return final_image
+
+    # return primary_img
 
 # Load and resize images
 image_folder = "DATA"

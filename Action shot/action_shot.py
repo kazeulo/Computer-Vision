@@ -27,8 +27,8 @@ def crop_image(frame, start_x, end_x, crop_height):
     cropped_frame = frame[0:crop_height, start_x:end_x]
     return cropped_frame
 
-def detect_and_match_features(img1, img2, method="SIFT"):
-    detector = cv2.SIFT_create(nfeatures=15000) if method == "SIFT" else cv2.ORB_create(nfeatures=15000)
+def detect_and_match_features(img1, img2):
+    detector = cv2.SIFT_create(nfeatures=15000)
 
     gray_img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     gray_img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
@@ -94,35 +94,32 @@ def warp_and_blend(base_img, new_img, H):
 
     return feather_blend(base_warped, new_warped)
 
-
-def final_crop(image):
+def crop_black_background(image):
+    
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, binary_mask = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)
 
-    non_zero_coords = cv2.findNonZero(gray)
+    # Find contours of the image
+    contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Get coordinates of the bounding box 
+    x, y, w, h = cv2.boundingRect(contours[0])
+
+    cropped_image = image[y:y + h, x:x + w]
+    cropped_image = cropped_image[20:-20, 15:-15]
     
-    if non_zero_coords is not None:
-        # Get the bounding box of the non-zero area
-        x, y, w, h = cv2.boundingRect(non_zero_coords)
-        
-        # Remove black spaces
-        cropped_image = image[y:y+h, x:x+w]
-
-        cropped_image = cropped_image[20:-20, 15:-15]
-
-        return cropped_image
-    
-    return image 
+    return cropped_image
 
 def stitch_images(images):
     primary_img = images[0]
     for i in range(1, len(images)):
         print(f"Stitching image {i + 1}...")
-        kp1, kp2, matches = detect_and_match_features(primary_img, images[i], FEATURE_DETECTOR)
+        kp1, kp2, matches = detect_and_match_features(primary_img, images[i])
         H = find_homography(kp1, kp2, matches)
         primary_img = warp_and_blend(primary_img, images[i], H)
     
     # Fill canvas and crop the image
-    final_image = final_crop(primary_img)
+    final_image = crop_black_background(primary_img)
     return final_image
 
 def process_video(video_path, frame_numbers, crop_positions):
@@ -140,12 +137,6 @@ def process_video(video_path, frame_numbers, crop_positions):
 
     return stitched_image
 
-    # plt.figure(figsize=(12, 12))
-    # plt.imshow(cv2.cvtColor(stitched_image, cv2.COLOR_BGR2RGB))
-    # plt.title('Stitched Video Frames')
-    # plt.axis('off')
-    # plt.show()
-
 video_path = "video/kick.mp4"
 frame_numbers = [1, 36, 48, 58, 70, 95]
 crop_positions = [
@@ -161,7 +152,6 @@ stitched_image = process_video(video_path, frame_numbers, crop_positions)
 
 cv2.imwrite('Action_shot.jpg', stitched_image)
 
-# Display the stitched image using plt
 plt.figure(figsize=(12, 12))
 plt.imshow(cv2.cvtColor(stitched_image, cv2.COLOR_BGR2RGB))
 plt.title('Stitched Video Frames')
